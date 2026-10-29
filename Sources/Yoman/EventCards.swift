@@ -246,7 +246,9 @@ struct EventEditor: View {
                             .tag(c.id)
                     }
                 }
-                .labelsHidden().fixedSize()
+                // Not fixedSize: long account names ("someone@company.com — Google") would push the
+                // editor wider than a narrow popup. Let the button shrink and truncate instead.
+                .labelsHidden().frame(maxWidth: 360, alignment: .leading)
             }
 
             if model.calendar(withID: draft.calendarID)?.isGoogle == true, draft.existing?.meetingURL == nil {

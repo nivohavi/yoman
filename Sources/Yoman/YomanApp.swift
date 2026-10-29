@@ -103,6 +103,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSPo
         if CommandLine.arguments.contains("--popup") {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in self?.togglePopover() }
         }
+        if CommandLine.arguments.contains("--new-event") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [model] in model.newDraft() }
+        }
     }
 
     /// Exercises the Google plumbing that doesn't need real credentials.

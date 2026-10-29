@@ -127,7 +127,7 @@ EventKit; when Google sign-in is used, it talks only to Google's Calendar API.
 | `build.sh` | Builds, signs (ad-hoc), installs and restarts the app |
 
 Developer flags (for testing): `--demo` (fictional calendar, no access needed), `--popup`, `--window`,
-`--mode=week`, `--date=YYYY-MM-DD`, `--no-focus`, `--dump-sources`, `--selftest`.
+`--mode=week`, `--date=YYYY-MM-DD`, `--new-event`, `--no-focus`, `--dump-sources`, `--selftest`.
 
 ## License
 
