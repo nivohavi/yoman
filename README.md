@@ -38,19 +38,61 @@ in SwiftUI with more views and multi-account support. Not affiliated with Google
 - macOS 14 (Sonoma) or later
 - To build: Apple's Command Line Tools (`xcode-select --install`) or Xcode
 
-## Install
+## Download (easiest)
+
+1. Download **Yoman-x.y.z.dmg** from the [latest release](https://github.com/nivohavi/yoman/releases/latest).
+2. Open it and drag **Yoman** onto **Applications**.
+3. Open Yoman from Applications. macOS says it can't verify the developer (the app isn't signed with
+   a paid Apple Developer ID) — click **Done**, then go to **System Settings › Privacy & Security**,
+   scroll down and click **Open Anyway** next to Yoman. You only do this once.
+4. Allow calendar access when asked, and find the calendar icon in your menu bar (or press **⌥⌘K**).
+
+Prefer not to approve a downloaded app? Build it yourself instead — see below.
+
+## Install from source
+
+Takes about 2 minutes. You build it on your own Mac, so there's no security prompt.
+
+**1. Make sure you have Apple's build tools.** If `git --version` works, you already do; otherwise:
 
 ```bash
-git clone https://github.com/nivohavi/yoman.git
-cd yoman
-./build.sh install     # builds a universal app and copies it to /Applications
+xcode-select --install
 ```
 
-On first launch macOS asks for calendar access — choose **Allow Full Access**.
-Rebuild and restart after pulling changes with `./build.sh`.
+**2. Download and install Yoman:**
 
-> An app you build yourself isn't quarantined, so Gatekeeper won't block it. A copy downloaded
-> from elsewhere would need to be signed with a Developer ID and notarized.
+```bash
+git clone https://github.com/nivohavi/yoman.git ~/yoman
+cd ~/yoman && ./build.sh install
+```
+
+This builds the app and copies it to **/Applications/Yoman.app**, then starts it.
+
+**3. Allow calendar access.** On first launch macOS asks — choose **Allow Full Access**.
+Yoman shows every calendar your Mac already syncs (System Settings › Internet Accounts),
+so Google accounts added there appear automatically.
+
+**4. Find it in the menu bar** — a small calendar icon with today's date. Click it, or press **⌥⌘K** anywhere.
+Optional: **Settings › General › Launch at login**.
+
+### Update
+
+```bash
+cd ~/yoman && git pull && ./build.sh install
+```
+
+### Uninstall
+
+Quit Yoman (right-click the menu-bar icon › Quit), then delete **/Applications/Yoman.app** and the `~/yoman` folder.
+
+### Troubleshooting
+
+- **No icon in the menu bar?** Crowded menu bars (especially with a notch) hide new icons. Press **⌥⌘K**,
+  ⌘-drag other icons to make room, or quit a few menu-bar apps.
+- **"Connect a calendar" / no events?** Allow access in **System Settings › Privacy & Security › Calendars › Yoman**.
+- **A Google calendar is missing?** It must be synced to your Mac: add the account in Internet Accounts with
+  Calendars on, and tick shared calendars at <https://calendar.google.com/calendar/syncselect>.
+- **`xcrun: error` / `swift: command not found`?** Run step 1 again.
 
 ## Google sign-in (optional)
 
@@ -84,8 +126,8 @@ EventKit; when Google sign-in is used, it talks only to Google's Calendar API.
 | `scripts/make-icon.swift` | Renders `Resources/AppIcon.icns` |
 | `build.sh` | Builds, signs (ad-hoc), installs and restarts the app |
 
-Developer flags (for testing): `--popup`, `--window`, `--mode=week`, `--date=YYYY-MM-DD`,
-`--no-focus`, `--dump-sources`, `--selftest`.
+Developer flags (for testing): `--demo` (fictional calendar, no access needed), `--popup`, `--window`,
+`--mode=week`, `--date=YYYY-MM-DD`, `--no-focus`, `--dump-sources`, `--selftest`.
 
 ## License
 

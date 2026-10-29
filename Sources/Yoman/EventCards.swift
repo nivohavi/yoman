@@ -94,7 +94,7 @@ struct EventDetailCard: View {
                 }
             }
 
-            if event.googleRef == nil, let me = event.selfAttendee, !me.isOrganizer {
+            if event.ekEvent != nil, let me = event.selfAttendee, !me.isOrganizer {
                 // Apple's calendar API can't send RSVPs; hand off to Google Calendar or the Calendar app.
                 row(icon: "hand.raised") {
                     VStack(alignment: .leading, spacing: 6) {
@@ -112,7 +112,7 @@ struct EventDetailCard: View {
                 }
             }
 
-            if event.googleRef != nil, let me = event.selfAttendee, !me.isOrganizer {
+            if event.googleRef != nil || event.isDemo, let me = event.selfAttendee, !me.isOrganizer {
                 row(icon: "hand.raised") {
                     HStack(spacing: 6) {
                         Text("Going?").font(.system(size: 13))

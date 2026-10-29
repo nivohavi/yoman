@@ -2,6 +2,7 @@
 # Builds Yoman.app (universal, ad-hoc signed) into ./build.
 #   ./build.sh           build, and restart Yoman if it's running
 #   ./build.sh install   build, copy to /Applications, and run it from there
+#   ./build.sh dmg       build build.noindex/Yoman-<VERSION>.dmg for a GitHub release
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -16,6 +17,7 @@ fi
 swift build -c release --arch arm64 --arch x86_64 2>&1 | grep -v "ld: warning: search path"
 BIN=$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)/Yoman
 
+VERSION=$(cat VERSION)
 APP=build.noindex/Yoman.app
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
@@ -31,8 +33,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleDisplayName</key><string>Yoman</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
-  <key>CFBundleShortVersionString</key><string>1.0</string>
-  <key>CFBundleVersion</key><string>1</string>
+  <key>CFBundleShortVersionString</key><string>$VERSION</string>
+  <key>CFBundleVersion</key><string>$VERSION</string>
   <key>LSMinimumSystemVersion</key><string>14.0</string>
   <key>LSUIElement</key><true/>
   <key>LSApplicationCategoryType</key><string>public.app-category.productivity</string>
@@ -53,7 +55,18 @@ restart() {
   open "$1"
 }
 
-if [[ "${1:-}" == "install" ]]; then
+if [[ "${1:-}" == "dmg" ]]; then
+  # Drag-to-install disk image: Yoman.app next to a shortcut to /Applications.
+  STAGE=build.noindex/dmg
+  DMG=build.noindex/Yoman-$VERSION.dmg
+  rm -rf "$STAGE" "$DMG"
+  mkdir -p "$STAGE"
+  ditto "$APP" "$STAGE/Yoman.app"
+  ln -s /Applications "$STAGE/Applications"
+  hdiutil create -quiet -volname "Yoman $VERSION" -srcfolder "$STAGE" -fs HFS+ -format UDZO -ov "$DMG"
+  rm -rf "$STAGE"
+  echo "Built $DMG ($(du -h "$DMG" | cut -f1))"
+elif [[ "${1:-}" == "install" ]]; then
   # Same bundle ID and signature requirement, so calendar access and settings carry over.
   pkill -x Yoman 2>/dev/null || true
   while pgrep -x Yoman >/dev/null; do sleep 0.2; done

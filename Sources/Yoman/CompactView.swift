@@ -57,7 +57,12 @@ struct CompactView: View {
             month = selectedDay
             focused = true
         }
-        .task(id: fetchKey) { reloadEvents() }
+        .task(id: fetchKey) {
+            reloadEvents()
+            if let t = Demo.selectTitle, model.selected == nil, let e = events.first(where: { $0.title == t }) {
+                model.selected = e
+            }
+        }
         .task {
             guard let d = model.switchDate else { return }
             try? await Task.sleep(for: .seconds(3))

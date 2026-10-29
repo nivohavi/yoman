@@ -63,7 +63,7 @@ final class CalendarModel {
     private var appleEnabled: Bool { prefs.useAppleCalendars && access == .granted }
 
     /// Something to show: Apple access, or at least one Google account.
-    var hasAnySource: Bool { appleEnabled || !google.accounts.isEmpty }
+    var hasAnySource: Bool { Demo.enabled || appleEnabled || !google.accounts.isEmpty }
 
     init() {
         NotificationCenter.default.addObserver(forName: .EKEventStoreChanged, object: store, queue: .main) { [weak self] _ in
@@ -76,6 +76,11 @@ final class CalendarModel {
     // MARK: Access
 
     func requestAccess() async {
+        if Demo.enabled {
+            access = .disabled
+            storeChanged()
+            return
+        }
         guard prefs.useAppleCalendars else {
             access = .disabled
             storeChanged()
@@ -128,6 +133,10 @@ final class CalendarModel {
     // MARK: Calendars
 
     private func loadCalendars() {
+        if Demo.enabled {
+            groups = Demo.groups
+            return
+        }
         ekCalendars = appleEnabled ? store.calendars(for: .event).map(CalendarInfo.init(ek:)) : []
         var appleGroups = Dictionary(grouping: ekCalendars, by: \.sourceTitle)
             .map { title, cals in
@@ -209,6 +218,7 @@ final class CalendarModel {
     func fetch(_ interval: DateInterval, load: Bool = true) -> [CalEvent] {
         let visible = Set(visibleCalendars.map(\.id))
         var out: [CalEvent] = []
+        if Demo.enabled { out = Demo.events(in: interval).filter { visible.contains($0.calendar.id) } }
         if appleEnabled {
             let ekCals = ekCalendars.filter { visible.contains($0.id) }
             let byID = Dictionary(uniqueKeysWithValues: ekCals.map { ($0.id, $0) })
@@ -222,7 +232,7 @@ final class CalendarModel {
                 }
             }
         }
-        out += google.events(in: interval, visible: visible, load: load)
+        if !Demo.enabled { out += google.events(in: interval, visible: visible, load: load) }
         return out
             .filter { !(prefs.hideDeclined && $0.isDeclined) }
             .sorted { a, b in

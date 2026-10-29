@@ -88,6 +88,7 @@ struct CalEvent: Identifiable, Hashable {
     enum Origin {
         case eventKit(EKEvent)
         case google(GoogleEventRef)
+        case demo
     }
 
     let id: String
@@ -142,6 +143,7 @@ struct CalEvent: Identifiable, Hashable {
     }
 
     var ekEvent: EKEvent? { if case .eventKit(let e) = origin { e } else { nil } }
+    var isDemo: Bool { if case .demo = origin { true } else { false } }
     var googleRef: GoogleEventRef? { if case .google(let r) = origin { r } else { nil } }
 
     /// Rendered in the all-day lane rather than the time grid (Google Calendar behaviour).
